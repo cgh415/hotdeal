@@ -1,9 +1,504 @@
-<html>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>기저귀 가격비교</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-  <body>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-    <h1>기저귀가격비교</h1>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-  </body>
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
 
+        .header h1 {
+            color: white;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.1em;
+        }
+
+        .search-section {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .search-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 20px;
+            align-items: end;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .form-group select {
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 1em;
+            background: white;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group select:disabled {
+            background: #f8f9fa;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .search-btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            transform: translateY(0);
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .search-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .results {
+            display: none;
+        }
+
+        .results.show {
+            display: block;
+        }
+
+        .results-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .results-header h2 {
+            color: white;
+            font-size: 2em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .results-header p {
+            color: rgba(255,255,255,0.9);
+            font-size: 1.1em;
+        }
+
+        .product-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f8f9fa;
+        }
+
+        .product-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .price-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .product-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .detail-item:hover {
+            background: #e9ecef;
+            transform: scale(1.02);
+        }
+
+        .detail-label {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .detail-value {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .best-deal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: #ff6b6b;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .no-results {
+            text-align: center;
+            color: white;
+            font-size: 1.2em;
+            padding: 50px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        @media (max-width: 768px) {
+            .search-form {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .product-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .product-details {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍼 기저귀 가격비교</h1>
+            <p>최저가 기저귀를 찾아보세요!</p>
+        </div>
+
+        <div class="search-section">
+            <div class="search-form">
+                <div class="form-group">
+                    <label for="brand-select">브랜드 선택</label>
+                    <select id="brand-select">
+                        <option value="">브랜드를 선택하세요</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="product-select">종류 선택</label>
+                    <select id="product-select" disabled>
+                        <option value="">먼저 브랜드를 선택하세요</option>
+                    </select>
+                </div>
+                <button class="search-btn" id="search-btn" disabled>제품 검색</button>
+            </div>
+        </div>
+
+        <div class="results" id="results">
+            <div class="results-header">
+                <h2 id="results-title">검색 결과</h2>
+                <p id="results-subtitle">찾으시는 제품의 상세 정보입니다</p>
+            </div>
+            <div class="product-cards" id="product-cards"></div>
+        </div>
+    </div>
+
+    <script>
+        // 데이터 저장 위치 - 여기에 JSON 데이터를 저장합니다
+        const diaperData = {
+            "하기스": {
+                "네이처메이드 2024 (팬츠)": [
+                    {
+                        "한박스가격": 35800,
+                        "박스당팩수": 3,
+                        "단계": "1단계",
+                        "팩당개수": 66,
+                        "개당가격": 181
+                    },
+                    {
+                        "한박스가격": 35800,
+                        "박스당팩수": 3,
+                        "단계": "2단계",
+                        "팩당개수": 58,
+                        "개당가격": 206
+                    },
+                    {
+                        "한박스가격": 35800,
+                        "박스당팩수": 3,
+                        "단계": "3단계",
+                        "팩당개수": 50,
+                        "개당가격": 239
+                    },
+                    {
+                        "한박스가격": 35800,
+                        "박스당팩수": 3,
+                        "단계": "4단계",
+                        "팩당개수": 40,
+                        "개당가격": 298
+                    },
+                    {
+                        "한박스가격": 35800,
+                        "박스당팩수": 3,
+                        "단계": "5단계",
+                        "팩당개수": 34,
+                        "개당가격": 351
+                    }
+                ],
+                "매직팬티 2024": [
+                    {
+                        "한박스가격": 52000,
+                        "박스당팩수": 4,
+                        "단계": "3단계",
+                        "팩당개수": 24,
+                        "개당가격": 541.6
+                    }
+                ]
+            },
+            "페미": {
+                "슈퍼드라이": [
+                    {
+                        "한박스가격": 28000,
+                        "박스당팩수": 4,
+                        "단계": "신생아",
+                        "팩당개수": 30,
+                        "개당가격": 233
+                    },
+                    {
+                        "한박스가격": 30000,
+                        "박스당팩수": 4,
+                        "단계": "소형",
+                        "팩당개수": 28,
+                        "개당가격": 267
+                    }
+                ]
+            },
+            "마더케이": {
+                "네이처핏": [
+                    {
+                        "한박스가격": 45000,
+                        "박스당팩수": 3,
+                        "단계": "중형",
+                        "팩당개수": 45,
+                        "개당가격": 333
+                    }
+                ]
+            }
+        };
+
+        // DOM 요소 가져오기
+        const brandSelect = document.getElementById('brand-select');
+        const productSelect = document.getElementById('product-select');
+        const searchBtn = document.getElementById('search-btn');
+        const results = document.getElementById('results');
+        const productCards = document.getElementById('product-cards');
+        const resultsTitle = document.getElementById('results-title');
+        const resultsSubtitle = document.getElementById('results-subtitle');
+
+        // 브랜드 옵션 로드
+        function loadBrands() {
+            Object.keys(diaperData).forEach(brand => {
+                const option = document.createElement('option');
+                option.value = brand;
+                option.textContent = brand;
+                brandSelect.appendChild(option);
+            });
+        }
+
+        // 브랜드 선택 시 제품 옵션 로드
+        brandSelect.addEventListener('change', function() {
+            const selectedBrand = this.value;
+            productSelect.innerHTML = '<option value="">종류를 선택하세요</option>';
+            
+            if (selectedBrand) {
+                productSelect.disabled = false;
+                Object.keys(diaperData[selectedBrand]).forEach(product => {
+                    const option = document.createElement('option');
+                    option.value = product;
+                    option.textContent = product;
+                    productSelect.appendChild(option);
+                });
+            } else {
+                productSelect.disabled = true;
+                productSelect.innerHTML = '<option value="">먼저 브랜드를 선택하세요</option>';
+                searchBtn.disabled = true;
+            }
+        });
+
+        // 제품 선택 시 검색 버튼 활성화
+        productSelect.addEventListener('change', function() {
+            searchBtn.disabled = !this.value;
+        });
+
+        // 검색 버튼 클릭
+        searchBtn.addEventListener('click', function() {
+            const selectedBrand = brandSelect.value;
+            const selectedProduct = productSelect.value;
+            
+            if (selectedBrand && selectedProduct) {
+                displayResults(selectedBrand, selectedProduct);
+            }
+        });
+
+        // 결과 표시
+        function displayResults(brand, product) {
+            const productData = diaperData[brand][product];
+            
+            resultsTitle.textContent = `${brand} - ${product}`;
+            resultsSubtitle.textContent = `${productData.length}개의 옵션을 찾았습니다`;
+            
+            productCards.innerHTML = '';
+            
+            // 개당 가격 기준으로 정렬하여 최저가 표시
+            const sortedData = [...productData].sort((a, b) => a.개당가격 - b.개당가격);
+            
+            sortedData.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                
+                card.innerHTML = `
+                    ${index === 0 ? '<div class="best-deal">최저가!</div>' : ''}
+                    <div class="product-header">
+                        <div class="product-title">${item.단계}</div>
+                        <div class="price-badge">₩${item.개당가격.toLocaleString()}/개</div>
+                    </div>
+                    <div class="product-details">
+                        <div class="detail-item">
+                            <div class="detail-label">한 박스 가격</div>
+                            <div class="detail-value">₩${item.한박스가격.toLocaleString()}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">박스당 팩 수</div>
+                            <div class="detail-value">${item.박스당팩수}팩</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">팩당 개수</div>
+                            <div class="detail-value">${item.팩당개수}개</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">총 개수</div>
+                            <div class="detail-value">${item.박스당팩수 * item.팩당개수}개</div>
+                        </div>
+                    </div>
+                `;
+                
+                productCards.appendChild(card);
+            });
+            
+            results.classList.add('show');
+            results.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 페이지 로드 시 브랜드 옵션 로드
+        document.addEventListener('DOMContentLoaded', loadBrands);
+    </script>
+</body>
 </html>
